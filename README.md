@@ -1,13 +1,38 @@
-None-Plainar-Slicing
-Introduction
+# None-Plainar-Slicing 
 
-None-Plainar-Slicing is a Python-based project. This repository is currently private.
-Installation
+## Introduction
+This project enables slicing of G-code for non-planar 3D printing. The process involves three main steps:
 
-Provide instructions on how to install your project.
-Usage
+1. **Preprocessing the Mesh:** Prepare the mesh model for slicing.
+2. **Slicing the Mesh:** Slice the mesh using any regular slicing technique.
+3. **Postprocessing the G-code:** Finalize the G-code for non-planar printing.
 
-Provide examples of how to use your project.
-License
+This workflow ensures that G-code is accurately generated for complex, non-planar printing tasks.
 
-This project does not currently specify a license.
+## Installation
+
+To get started with the None-Plainar-Slicing project, follow these steps:
+
+1. **Clone the Repository:**
+
+   First, clone the repository to your local machine using the following command:
+   ```bash
+   git clone https://github.com/q4yz/None-Plainar-Slicing.git
+   cd None-Plainar-Slicing
+---
+## Usage 
+
+This project enables slicing of G-code for non-planar 3D printing. The process involves three main steps:
+
+    - Preprocessing the Mesh: Prepare the mesh model for slicing.
+    - Slicing the Mesh: Slice the mesh using any regular slicing software.
+    - Postprocessing the G-code: Finalize the G-code for non-planar printing.
+
+This workflow ensures that G-code is accurately generated for complex, non-planar printing tasks.
+
+---
+## License 
+
+This project is licensed under the MIT License.
+
+---
