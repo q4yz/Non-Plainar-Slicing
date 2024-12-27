@@ -115,7 +115,7 @@ class ViewerMethoden():
 
             print("Selected file:", file_path.name)
             file_path.close()  
-            self.meshObject = MeshObject(path = file_path.name, viewer = self.OBJ_Canvis )
+            self.meshObject = MeshObject(path = file_path.name, viewer = self.OBJ_Canvas )
 
             
             
