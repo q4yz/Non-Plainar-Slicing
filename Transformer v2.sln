@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Transformer v2", "Transformer v2\Transformer v2.pyproj", "{78BEB8E3-6252-4A47-8A48-A0C3E886A952}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "NonPlainarSlicingScript", "Transformer v2\NonPlainarSlicingScript.pyproj", "{78BEB8E3-6252-4A47-8A48-A0C3E886A952}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

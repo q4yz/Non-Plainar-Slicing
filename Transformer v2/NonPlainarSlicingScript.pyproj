@@ -3,13 +3,14 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>78beb8e3-6252-4a47-8a48-a0c3e886a952</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
-    <StartupFile>UI.py</StartupFile>
+    <ProjectHome>
+    </ProjectHome>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>Transformer v2</Name>
+    <Name>NonPlainarSlicingScript</Name>
     <RootNamespace>Transformer v2</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -24,10 +25,11 @@
     <Compile Include="canvisViewer.py" />
     <Compile Include="Constants.py" />
     <Compile Include="Gcode.py" />
+    <Compile Include="main.py" />
     <Compile Include="MeshObject.py" />
     <Compile Include="Settings.py" />
     <Compile Include="Split.py" />
-    <Compile Include="UI.py" />
+    <Compile Include="Viewer.py" />
     <Compile Include="ViewerMethoden.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
