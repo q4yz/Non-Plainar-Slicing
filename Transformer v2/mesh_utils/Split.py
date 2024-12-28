@@ -1,42 +1,32 @@
-from time import sleep
-import tkinter as tk
-import tkinter
-from tkinter import filedialog
-from tkinter import ttk
-from Constants import *
-
 import trimesh
 import numpy as np
 
+from utils import checkForVerticesOnPlain
+from transformation import rotate_to_align
 
-def rotate_to_align(normal, target=(0, 0, 1)):
-    """
-    Create a rotation matrix to align the `normal` vector with the `target` vector.
-    """
-    normal = normal / np.linalg.norm(normal)
-    target = np.array(target) / np.linalg.norm(target)
-    axis = np.cross(normal, target)
-    angle = np.arccos(np.dot(normal, target))
-    if np.linalg.norm(axis) < 1e-6:  # If already aligned
-        return np.eye(4)
-    axis = axis / np.linalg.norm(axis)
-    rotation_matrix = trimesh.transformations.rotation_matrix(angle, axis)
-    return rotation_matrix
 
-def multisplit(mesh, normal, steps):
+def multisplit(mesh: trimesh.Trimesh, normal, steps):
     """
     Rotates the mesh so the normal aligns with (0, 0, z),
     translates it to the starting position, and applies `splitFacesOnZZero` 
     at each step along the z-axis.
     """
     # Rotate the mesh to align the normal with (0, 0, 1)
+
+
+    if normal.shape != (3,):
+        raise ValueError("The normal vector must be a 3D vector.")
+
+    steps = np.array(steps, dtype=np.float64)  # Convert to NumPy array for consistency
+    if steps.ndim != 1:
+        raise ValueError("Steps must be a 1D list or array of z-values.")
+
     rotation_matrix = rotate_to_align(normal, target=(0, 0, 1))
     mesh.apply_transform(rotation_matrix)
 
     applyedOffset = 0
     
-
-    # Apply splitFacesOnZZero at each step
+    
     for step in steps:
         # Translate the mesh by the step in the z direction
         step_translation = trimesh.transformations.translation_matrix([0, 0, -step -applyedOffset])
@@ -58,10 +48,6 @@ def multisplit(mesh, normal, steps):
 
 
 def splitFacesOnZZero(mesh:trimesh.Trimesh) -> trimesh.Trimesh: 
-
-    def checkForVerticesOnPlain(v) -> bool:
-        maskOnPlain = v[:, 2] == 0
-        return np.any(maskOnPlain)
 
     old_v = mesh.vertices
     old_f = mesh.faces
@@ -108,7 +94,7 @@ def splitFacesOnZZero(mesh:trimesh.Trimesh) -> trimesh.Trimesh:
     newVerices = np.full((len(intersectingFaces) * 2, 3), 0)
     newVerices = np.vstack([old_v, newVerices])
 
-    def find_intersection(v1, v2):
+    def findIntersectionOnZPlain(v1, v2):
         # Calculate t for the intersection on the z = 0 plane
         t = -v1[2] / (v2[2] - v1[2])
         # Calculate the intersection point v12
@@ -124,8 +110,8 @@ def splitFacesOnZZero(mesh:trimesh.Trimesh) -> trimesh.Trimesh:
         v3 = old_v[indexV3]
         indexV12 = i*2 + len(old_v)
         indexV13 = i*2 + 1 + len(old_v)
-        v12 = find_intersection(v1, v2)
-        v13 = find_intersection(v1, v3)
+        v12 = findIntersectionOnZPlain(v1, v2)
+        v13 = findIntersectionOnZPlain(v1, v3)
 
         newVerices[indexV12] = v12
         newVerices[indexV13] = v13

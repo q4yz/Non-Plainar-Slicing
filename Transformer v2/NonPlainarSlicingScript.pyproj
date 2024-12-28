@@ -27,10 +27,16 @@
     <Compile Include="Gcode.py" />
     <Compile Include="main.py" />
     <Compile Include="MeshObject.py" />
+    <Compile Include="mesh_utils\transformation.py" />
+    <Compile Include="mesh_utils\utils.py" />
+    <Compile Include="mesh_utils\__init__.py" />
     <Compile Include="Settings.py" />
-    <Compile Include="Split.py" />
+    <Compile Include="mesh_utils\split.py" />
     <Compile Include="Viewer.py" />
     <Compile Include="ViewerMethoden.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="mesh_utils\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
