@@ -1,5 +1,10 @@
 import trimesh
-from Split import *  
+
+
+
+import mesh_utils
+#from Split import *  
+
 import numpy as np
 import logging
 from collections import deque
@@ -88,16 +93,16 @@ class MeshObject():
         unique_x_coords = np.unique(x_coords)
         normal = [1, 0, 0]        
         unique_x_coords = [x + 0.00001 for x in unique_x_coords]
-        mesh = multisplit(mesh, normal, unique_x_coords)
+        mesh = mesh_utils.multisplit(mesh, normal, unique_x_coords)
 
         unique_y_coords = np.unique(y_coords)
         normal = [0, 1, 0]        
         unique_y_coords = [y + 0.0001 for y in unique_y_coords]
-        mesh = multisplit(mesh, normal, unique_y_coords)
+        mesh = mesh_utils.multisplit(mesh, normal, unique_y_coords)
        
         normal = [1, 1, 0]        
         unique_xy_coords = [x*2**(0.5) + 0.000001 for x in unique_x_coords]
-        self.mesh = multisplit(mesh, normal, unique_xy_coords)
+        self.mesh = mesh_utils.multisplit(mesh, normal, unique_xy_coords)
 
         self.viewer.view_obj(self.mesh)
         self.viewer.canvas.draw()
