@@ -1,9 +1,8 @@
 import trimesh
 import numpy as np
 
-from utils import checkForVerticesOnPlain
-from transformation import rotate_to_align
-
+from .utils import checkForVerticesOnPlain
+from .transformation import rotate_to_align
 
 def multisplit(mesh: trimesh.Trimesh, normal, steps):
     """
@@ -13,7 +12,7 @@ def multisplit(mesh: trimesh.Trimesh, normal, steps):
     """
     # Rotate the mesh to align the normal with (0, 0, 1)
 
-
+    normal = np.array(normal)
     if normal.shape != (3,):
         raise ValueError("The normal vector must be a 3D vector.")
 
