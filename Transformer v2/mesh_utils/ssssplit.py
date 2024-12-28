@@ -12,14 +12,6 @@ def multisplit(mesh: trimesh.Trimesh, normal, steps):
     """
     # Rotate the mesh to align the normal with (0, 0, 1)
 
-    normal = np.array(normal)
-    if normal.shape != (3,):
-        raise ValueError("The normal vector must be a 3D vector.")
-
-    steps = np.array(steps, dtype=np.float64)  # Convert to NumPy array for consistency
-    if steps.ndim != 1:
-        raise ValueError("Steps must be a 1D list or array of z-values.")
-
     rotation_matrix = rotate_to_align(normal, target=(0, 0, 1))
     mesh.apply_transform(rotation_matrix)
 
