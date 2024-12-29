@@ -3,10 +3,10 @@ from time import sleep
 import tkinter as tk
 import tkinter
 from tkinter import filedialog
-from tkinter import ttk
 from Gcode import *
-from MeshObject import MeshObject
-import trimesh
+
+import mesh_object
+
 
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -115,7 +115,7 @@ class ViewerMethoden():
 
             print("Selected file:", file_path.name)
             file_path.close()  
-            self.meshObject = MeshObject(path = file_path.name, viewer = self.OBJ_Canvas )
+            self.meshObject = mesh_object.MeshObject(path = file_path.name, viewer = self.OBJ_Canvas )
 
             
             

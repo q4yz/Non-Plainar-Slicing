@@ -5,7 +5,7 @@ import tkinter
 from tkinter import filedialog
 from tkinter import ttk
 import numpy as np
-from MeshObject import MeshObject
+import mesh_object
 from Constants import *
 
 class Gcode():
@@ -31,10 +31,6 @@ class Gcode():
 
         commandListPoints = self.zBackTrans(commandListPoints, meshobject)
 
-
-        
-
-        
         
         self.shiftPoints(commandListPoints, offset )
         
@@ -144,10 +140,8 @@ class Gcode():
         offset = np.append(offset, 0)
         points[:, :4] += offset
 
-     
-    
 
-    def zBackTrans(self, commandListPoints, mesh:MeshObject):
+    def zBackTrans(self, commandListPoints, mesh:mesh_object.MeshObject):
         print("start - zBackTrans")
         locations, index_ray = mesh.distortOnTrans(commandListPoints[:,:3])
 
@@ -159,7 +153,7 @@ class Gcode():
 
 
 
-    def printTofile(self, commandList, pointsIndex,pointList):
+    def printTofile(self, commandList, pointsIndex, pointList):
         print("start - printTofile")
         outCommands = np.empty(len(commandList) + len(pointList), dtype='U256')
         print(len(pointsIndex))
@@ -209,42 +203,7 @@ class Gcode():
 
         print("end - printTofile")
 
-    #def printTofile(self, commandList, pointsIndex,pointList):
-    #    print("start - printTofile")
-    #    outCommands = []
-      
-
-    #    for i , c in enumerate(commandList):
-        
-    #        if c['command'] == 'G1' or c['command'] == 'G0':
-
-    #            for index, p in zip(pointsIndex, pointList):
-    #                if index == i:
-    #                    final_str = f"{c['command']} X{p[0]:.2f} Y{p[1]:.2f} Z{p[2]:.2f} E{p[3]:.2f}"
-    #                    outCommands.append(final_str)
-    #                if index > i:
-    #                    break
-    #        else:
-    #            command_str = f"{c['command']}"
-    #            params_str = "".join([f" {key}{value}" for key, value in c['parameters'].items()])    
-    #            final_str = command_str + params_str
-    #            outCommands.append(final_str)
-            
-    
-    #    file_path = "C:\Daten\Test-Slicer\Gcode_OUT\out.gcode"
-
-    #    try:
-    #        with open(file_path, 'w') as file:
-    #            for command in outCommands:
-    #                file.write(command + '\n')
-    #    except Exception as e:
-    #        print(f"Error writing to file: {e}")
-    #    else:
-    #        print("File written successfully.")
-
-    #    print("end - printTofile")
-       
-
+  
 
 
 

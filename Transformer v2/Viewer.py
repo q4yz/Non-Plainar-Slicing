@@ -13,7 +13,7 @@ from matplotlib.figure import Figure
 import trimesh
 
 from canvisViewer import CanvisViewer
-from MeshObject import MeshObject
+import mesh_object
 from Constants import *
 from ViewerMethoden import *
 from Settings import *
@@ -23,8 +23,6 @@ class Viewer(ViewerMethoden):
     This Class saves Viewer Objects and creates the layout.
     """
 
-
-
     def __init__(self) -> None:
         """
         Initializes the Viewer class, sets up the UI and starts the main loop.
@@ -33,7 +31,7 @@ class Viewer(ViewerMethoden):
         self.root.wm_title("MY Slicer")
         self.root.geometry("1200x1000")
         
-        self.meshObject: MeshObject = None 
+        self.meshObject: mesh_object.MeshObject = None 
         self.OBJ_Canvas: CanvisViewer = CanvisViewer()
 
         self._create_top_frame()
