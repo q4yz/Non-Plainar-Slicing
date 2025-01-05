@@ -19,40 +19,38 @@ Ensure you have the following installed on your machine:
           Python 3.8 or higher
           Git
 
-Steps
-1) Clone the repository:
-
-    Open your terminal and run the following command to clone the repository:
+### Steps
+#### 1) Clone the repository:
+Open your terminal and run the following command to clone the repository:
 
          git clone https://github.com/q4yz/None-Plainar-Slicing.git
          cd None-Plainar-Slicing
 
-2) Set up a virtual environment:
-   Create a virtual environment to manage your dependencies:
+#### 2) Set up a virtual environment:
+Create a virtual environment to manage your dependencies:
 
          python -m venv myenv
 
-3) Activate the virtual environment:
-   On Windows:
+#### 3) Activate the virtual environment:
+On Windows:
 
          myenv\Scripts\activate
 
 
 
-4) Install the required dependencies:
+#### 4) Install the required dependencies:
 
-   With the virtual environment activated, install the required packages using pip:
+With the virtual environment activated, install the required packages using pip:
 
          python -m pip install -r requirements.txt
 
-5) Run the main script:
+#### 5) Run the main script:
 
-   Execute the main script to start the project:
+Execute the main script to start the project:
 
          python "Transformer v2/main.py"
 
-Notes
-
+#### Notes
 Ensure your terminal is in the None-Plainar-Slicing directory when running the commands.
 If you encounter any issues related to missing dependencies, make sure all required packages are listed in requirements.txt and installed.
 
