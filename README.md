@@ -50,7 +50,7 @@ With the virtual environment activated, install the required packages using pip:
 #### 5) Run the main script:
 Execute the main script to start the project:
 
-         python "Transformer v2/main.py"
+         python NonePlainarSlicing/main.py
 
 #### Notes
 Ensure your terminal is in the None-Plainar-Slicing directory when running the commands.
