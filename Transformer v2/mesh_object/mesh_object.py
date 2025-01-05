@@ -9,6 +9,8 @@ import numpy as np
 import logging
 from Constants import *
 
+from settings import *
+
 
 
 
@@ -66,10 +68,15 @@ class MeshObject():
         v_min, v_max = self.mesh.bounding_box.bounds
 
         self.mesh.apply_translation([-v_min[0] -(v_max[0]-v_min[0])/2,-v_min[1] -(v_max[1]-v_min[1] )/2 ,  -v_min[2] ])
+        print(settings)
+        distortionResolution = settings['DistortionResolution']
+        
+        
+        
 
-        v_min, v_max = self.mesh.bounding_box.bounds
+       
 
-        self.transformerPlain = TransformerPlain((v_min[0]-2.00,v_min[1]-2.00,v_max[0]+2.00,v_max[1]+2.00),7,self.viewer)
+        self.transformerPlain = TransformerPlain(self.mesh.bounding_box.bounds,distortionResolution,self.viewer)
 
 
         self.viewer.view_obj(self.mesh)
@@ -145,7 +152,7 @@ class MeshObject():
    
     def flattop(self):
         print("flaten")
-        k = 6
+        
         transMesh = self.transformerPlain.mesh
         v =  transMesh.vertices
         
@@ -182,6 +189,11 @@ class MeshObject():
         zMin = np.min( v[:, 2])
         v[:, 2] = v[:, 2] - zMin
 
+        distortionResolution = settings['DistortionResolution']
+        maxP = settings['Max P']
+        maxP_radians = np.radians(maxP)
+        k = np.arctan(maxP_radians) / distortionResolution
+
         transMesh = mesh_utils.smoothMesh(transMesh, k)
         self.transformerPlain.mesh = transMesh
         
@@ -190,7 +202,6 @@ class MeshObject():
 
 
     def noSupport(self):
-        k = 2
         transMesh = self.transformerPlain.mesh
         v =  transMesh.vertices
         
@@ -222,6 +233,10 @@ class MeshObject():
         zMin = np.min( v[:, 2])
         v[:, 2] = v[:, 2] - zMin
 
+        distortionResolution = settings['DistortionResolution']
+        maxP = settings['Max P']
+        maxP_radians = np.radians(maxP)
+        k = np.arctan(maxP_radians) / distortionResolution
 
         transMesh = mesh_utils.smoothMesh(transMesh, k)
         self.transformerPlain.mesh = transMesh

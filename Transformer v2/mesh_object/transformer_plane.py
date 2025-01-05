@@ -1,7 +1,5 @@
 import trimesh
 
-
-
 import mesh_utils
 #from Split import *  
 
@@ -35,7 +33,7 @@ class TransformerPlain():
         self.resolution = resolution
         self.create_plane()
 
-    def create_plane(self) ->None:
+    def create_plane(self) -> None:
         """
         Create a trimesh object representing a plane and saves it as self.mesh
         Parameters:
@@ -46,12 +44,18 @@ class TransformerPlain():
         -------
         None
         """
-        x_min, y_min, x_max, y_max = self.boundingbox
+        v_min, v_max = self.boundingbox
+        x_min, y_min, _ = v_min
+        x_max, y_max, _ = v_max
+
+        # Calculate the number of steps in each direction
+        x_steps = int((x_max - x_min) * self.resolution)
+        y_steps = int((y_max - y_min) * self.resolution)
 
         # Generate grid of vertices in the XY plane, with Z=0
-        x_coords = [x_min + i * (x_max - x_min) / (self.resolution - 1) for i in range(self.resolution)]
-        y_coords = [y_min + i * (y_max - y_min) / (self.resolution - 1) for i in range(self.resolution)]
-        
+        x_coords = np.linspace(x_min -0.015435, x_max +0.015435, x_steps)
+        y_coords = np.linspace(y_min -0.015435, y_max +0.015435, y_steps)
+
         vertices = []
         for y in y_coords:
             for x in x_coords:
@@ -59,12 +63,12 @@ class TransformerPlain():
 
         # Create faces by connecting vertices (assume quadrilateral faces split into two triangles)
         faces = []
-        for i in range(self.resolution - 1):
-            for j in range(self.resolution - 1):
+        for i in range(y_steps - 1):
+            for j in range(x_steps - 1):
                 # Get the index of the current vertex and its neighbors in the grid
-                top_left = i * self.resolution + j
+                top_left = i * x_steps + j
                 top_right = top_left + 1
-                bottom_left = (i + 1) * self.resolution + j
+                bottom_left = (i + 1) * x_steps + j
                 bottom_right = bottom_left + 1
 
                 # Create two triangles (top-left, bottom-left, bottom-right) and (top-left, bottom-right, top-right)
@@ -72,4 +76,4 @@ class TransformerPlain():
                 faces.append([top_left, bottom_right, top_right])
 
         # Create the trimesh object from vertices and faces
-        self.mesh = trimesh.Trimesh(vertices=vertices, faces=faces)   
+        self.mesh = trimesh.Trimesh(vertices=vertices, faces=faces)

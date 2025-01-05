@@ -16,7 +16,7 @@ from canvisViewer import CanvisViewer
 import mesh_object
 from Constants import *
 from ViewerMethoden import *
-from Settings import *
+from settings import *
 
 class Viewer(ViewerMethoden):
     """

@@ -7,7 +7,7 @@ from Constants import *
 import configparser
 
 # Example dictionary
-default_settings  = {'Max P': 100, 'MaxDistortionHight': 0.2, 'DistortionGridSize': 1, 'Test Parm3': 10, 'Test Parm5': 3, 'Test Parm7': 20}
+default_settings  = {'Max P': 30, 'MaxDistortionHight': 0.2, 'DistortionResolution': 0.25, 'Test Parm3': 10, 'Test Parm5': 3, 'Test Parm7': 20}
 
 def load_settings(file_path, default_settings):
     """Load settings from an .ini file, updating the defaults with the file's values."""
