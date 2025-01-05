@@ -1,8 +1,7 @@
 # None-Plainar-Slicing 
 
 ## Introduction
-This project is still in its early stage of develoment so it is more a prof of concet how g-code for none plainar printing can be generated 
-This project enables slicing of G-code for non-planar 3D printing. The G-code allows you to:
+This project is still in its early stage of development, so it is more a proof of concept on how G-code for non-planar printing can be generated. This project enables slicing of G-code for non-planar 3D printing. The G-code allows you to:
 
 - Reduce support structure
 - Improve top layer surface finish
