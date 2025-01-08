@@ -3,9 +3,10 @@ from time import sleep
 import tkinter as tk
 import tkinter
 from tkinter import filedialog
-from Gcode import *
+#from Gcode import *
 
 import mesh_object
+import gcode_object
 
 
 from matplotlib.backends.backend_tkagg import (
@@ -161,7 +162,7 @@ class ViewerMethoden():
             selectedPath:str = file_path.name
             file_path.close()  
 
-            self.meshObject.gcode = Gcode(selectedPath,self.meshObject)
+            self.meshObject.gcode = gcode_object.Gcode(selectedPath,self.meshObject)
 
         self.state = 6
  

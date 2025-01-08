@@ -7,8 +7,10 @@ from .transformer_plane import TransformerPlain
 
 import numpy as np
 import logging
-from Constants import *
 
+
+#remove this imports
+from Constants import *
 from settings import *
 
 
@@ -33,6 +35,9 @@ class MeshObject():
 
     gcode = None
     path = None
+
+    maxP = None
+    distortionResolution = None
     
    
     def __init__(self, **parameters) -> None:
@@ -188,7 +193,6 @@ class MeshObject():
 
         zMin = np.min( v[:, 2])
         v[:, 2] = v[:, 2] - zMin
-
         distortionResolution = settings['DistortionResolution']
         maxP = settings['Max P']
         maxP_radians = np.radians(maxP)

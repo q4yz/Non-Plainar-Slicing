@@ -28,7 +28,7 @@ class Viewer(ViewerMethoden):
         Initializes the Viewer class, sets up the UI and starts the main loop.
         """
         self.root = tk.Tk()
-        self.root.wm_title("MY Slicer")
+        self.root.wm_title("None Plainar Slicer")
         self.root.geometry("1200x1000")
         
         self.meshObject: mesh_object.MeshObject = None 
