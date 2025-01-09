@@ -1,3 +1,4 @@
+from xmlrpc.client import boolean
 import numpy as np
 
 
@@ -45,26 +46,36 @@ def getPointsFromCommands( commandList):
     print("start - getPointsFromCommands")
     commandListPoints = np.empty((len(commandList), 4))  # Pre-allocate the array
     commandListidexOfPoints = np.empty(len(commandList), dtype=int)
-
+    maskIsMesh = np.empty(len(commandList), dtype=bool)
     point_count = 0 
+    currentlyMesh = False
+    lastVertice = [0,0,0,0]
 
     for idx, command in enumerate(commandList):
-        
-        if command['command'] == 'G1' or command['command'] == 'G0': 
+        if command['command'].startswith(";MESH:NONMESH"):
+            currentlyMesh = False
+        elif command['command'].startswith(";MESH:"):
+            currentlyMesh = True
+
+        elif command['command'] == 'G1' or command['command'] == 'G0': 
             params = command.get('parameters', {})
-            x = params.get('X', None)
-            y = params.get('Y', None)
-            z = params.get('Z', None)  
-            e = params.get('E', None)  
+            x = params.get('X', lastVertice[0])
+            y = params.get('Y', lastVertice[1])
+            z = params.get('Z', lastVertice[2])  
+            e = params.get('E', lastVertice[3])  
+            
             commandListPoints[point_count] = [x, y, z, e]
             commandListidexOfPoints[point_count] = idx
+            maskIsMesh[point_count] = currentlyMesh
 
             point_count += 1 
+            lastVertice = [x,y,z,e]
 
     commandListPoints = commandListPoints[:point_count]
     commandListidexOfPoints = commandListidexOfPoints[:point_count]
+    maskIsMesh = maskIsMesh[:point_count]
     print("end - getPointsFromCommands")
-    return commandListidexOfPoints, commandListPoints
+    return commandListidexOfPoints, commandListPoints, maskIsMesh
 
 
 def segmentizeLines(pointsIndex,pointList, threshold  ):
@@ -96,6 +107,6 @@ def shiftPoints( points, offset):
     offset = np.append(offset, 0)
     points[:, :4] += offset
 
-    return offset
+    return points
 
    

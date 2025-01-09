@@ -13,7 +13,7 @@ def readGcodeFileToDicList( file_path) -> list:
 
             
             for line in lines:
-                line = line.split(';')[0].strip()
+                #line = line.split(';')[0].strip()
                 if not line:
                     continue
 

@@ -1,21 +1,11 @@
 import trimesh
 
-
+from tkinter import messagebox
 
 import mesh_utils
 from .transformer_plane import TransformerPlain
 
 import numpy as np
-import logging
-
-
-#remove this imports
-from Constants import *
-from settings import *
-
-
-
-
 
 
 class MeshObject():
@@ -31,13 +21,11 @@ class MeshObject():
     transformerPlain = None
     viewer = None
 
-    progress = 0
-
     gcode = None
     path = None
 
-    maxP = None
-    distortionResolution = None
+    #maxP = None
+    #distortionResolution = None
     
    
     def __init__(self, **parameters) -> None:
@@ -70,24 +58,34 @@ class MeshObject():
         else:
             raise ValueError("Either 'path' or both 'v' and 'f' must be provided.")
 
-        v_min, v_max = self.mesh.bounding_box.bounds
 
-        self.mesh.apply_translation([-v_min[0] -(v_max[0]-v_min[0])/2,-v_min[1] -(v_max[1]-v_min[1] )/2 ,  -v_min[2] ])
-        print(settings)
-        distortionResolution = settings['DistortionResolution']
-        
-        
+
+       
+        self.shiftToCenter()
+
+        #maxP = settings['Max P']
+        #distortionResolution = settings['DistortionResolution']
+        #self.createTransformerPlain(distortionResolution, maxP)
+
+        self.viewer.view_obj(self.mesh)
+        self.viewer.canvas.draw()
         
 
        
+    def shiftToCenter(self):
+        v_min, v_max = self.mesh.bounding_box.bounds
 
-        self.transformerPlain = TransformerPlain(self.mesh.bounding_box.bounds,distortionResolution,self.viewer)
+        self.mesh.apply_translation([-v_min[0] -(v_max[0]-v_min[0])/2,-v_min[1] -(v_max[1]-v_min[1] )/2 ,  -v_min[2] ])
+        
+        
+        
+    def createTransformerPlain(self, resolution, maxP):
+        self.transformerPlain = TransformerPlain(self.mesh.bounding_box.bounds,resolution,maxP, self.viewer)
 
 
-        self.viewer.view_obj(self.mesh)
+        
         self.viewer.view_transformer(self.transformerPlain.mesh)
         self.viewer.canvas.draw()
-        
 
     def splitMeshEdageOnTrans(self):
         """
@@ -187,16 +185,20 @@ class MeshObject():
         locations = locations[mask]
         print(locations)
 
-        zDefault = np.full(len(v), 10000)
-        v[:, 2] = zDefault
-        v[index_ray, 2] = -locations[:, 2]
+        
+        if locations.size != 0:
+            
+            v[:, 2] = np.full(len(v), 10000)
+            v[index_ray, 2] = -locations[:, 2]
+        else:
+            messagebox.showinfo("Warning", "Resultion of distortionplain is to low!")
 
         zMin = np.min( v[:, 2])
         v[:, 2] = v[:, 2] - zMin
-        distortionResolution = settings['DistortionResolution']
-        maxP = settings['Max P']
+        resolution = self.transformerPlain.resolution
+        maxP = self.transformerPlain.maxP
         maxP_radians = np.radians(maxP)
-        k = np.arctan(maxP_radians) / distortionResolution
+        k = np.arctan(maxP_radians) / resolution
 
         transMesh = mesh_utils.smoothMesh(transMesh, k)
         self.transformerPlain.mesh = transMesh
@@ -237,10 +239,10 @@ class MeshObject():
         zMin = np.min( v[:, 2])
         v[:, 2] = v[:, 2] - zMin
 
-        distortionResolution = settings['DistortionResolution']
-        maxP = settings['Max P']
+        resolution = self.transformerPlain.resolution
+        maxP = self.transformerPlain.maxP
         maxP_radians = np.radians(maxP)
-        k = np.arctan(maxP_radians) / distortionResolution
+        k = np.arctan(maxP_radians) / resolution
 
         transMesh = mesh_utils.smoothMesh(transMesh, k)
         self.transformerPlain.mesh = transMesh

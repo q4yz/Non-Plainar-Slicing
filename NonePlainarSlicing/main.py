@@ -1,6 +1,7 @@
 
 import logging
 from Viewer import Viewer
+import numpy as np
 
 # Configure logging
 logging.basicConfig(level=logging.INFO,
@@ -12,5 +13,7 @@ logging.basicConfig(level=logging.INFO,
                     ])
 
 # Start the Viewer
+np.set_printoptions(precision=4, suppress=True, edgeitems=8)  
+
 if __name__ == "__main__":
     Viewer()

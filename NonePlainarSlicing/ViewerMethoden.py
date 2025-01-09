@@ -19,7 +19,7 @@ import logging
 from threading import Thread
 import os
 from Constants import *
-
+from settings import *
 
 class ViewerMethoden():
     """
@@ -117,6 +117,10 @@ class ViewerMethoden():
             print("Selected file:", file_path.name)
             file_path.close()  
             self.meshObject = mesh_object.MeshObject(path = file_path.name, viewer = self.OBJ_Canvas )
+
+            maxP = settings['Max P']
+            distortionResolution = settings['DistortionResolution']
+            self.meshObject.createTransformerPlain(distortionResolution, maxP)
 
             
             
