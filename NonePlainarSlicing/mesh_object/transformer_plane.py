@@ -54,8 +54,8 @@ class TransformerPlain():
         y_steps = int((y_max - y_min) * self.resolution)
 
         # Generate grid of vertices in the XY plane, with Z=0
-        x_coords = np.linspace(x_min -0.015435, x_max +0.015435, x_steps)
-        y_coords = np.linspace(y_min -0.015435, y_max +0.015435, y_steps)
+        x_coords = np.linspace(x_min -1.015435, x_max +1.015435, x_steps)
+        y_coords = np.linspace(y_min -1.015435, y_max +1.015435, y_steps)
 
         vertices = []
         for y in y_coords:

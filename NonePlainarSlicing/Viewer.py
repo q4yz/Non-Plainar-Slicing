@@ -11,7 +11,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 import trimesh
-
+import os
 from canvisViewer import CanvisViewer
 import mesh_object
 from Constants import *
@@ -30,6 +30,8 @@ class Viewer(ViewerMethoden):
         self.root = tk.Tk()
         self.root.wm_title("None Plainar Slicer")
         self.root.geometry("1200x1000")
+        icon_path = os.path.abspath("icon.ico")
+        self.root.iconbitmap(icon_path)
         
         self.meshObject: mesh_object.MeshObject = None 
         self.OBJ_Canvas: CanvisViewer = CanvisViewer()
@@ -37,6 +39,8 @@ class Viewer(ViewerMethoden):
         self._create_top_frame()
         self._create_middle_frame()
         self._create_bottom_frame()
+
+
 
         tk.mainloop()
 

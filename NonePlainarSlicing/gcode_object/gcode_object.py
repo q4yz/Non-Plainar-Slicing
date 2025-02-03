@@ -20,21 +20,26 @@ class Gcode():
         commandList = readGcodeFileToDicList(path)
         
         commandListidexOfPoints, commandListPoints, maskIsMesh = getPointsFromCommands(commandList)
+        print(commandListPoints)
         offset = getOffsetFormOrigan(commandList, commandListidexOfPoints[maskIsMesh], commandListPoints[maskIsMesh])
-
+        print("off")
         commandListidexOfPoints, commandListPoints = segmentizeLines(commandListidexOfPoints, commandListPoints, 0.5)    
 
         shiftPoints(commandListPoints, -offset )
 
         commandListPoints = self.zBackTrans(commandListPoints, meshobject)
         print("z min")
-        z_min = np.min(commandListPoints[:,2])
-        if z_min  < -1:
-            raise ZMinCollisionException(z_min) 
-        elif z_min < 0:
-            offset[2] =  -z_min
+        z_min = np.nanmin(commandListPoints[:, 2])
+        
+        offset[2] =  -z_min +0.3
 
         shiftPoints(commandListPoints, offset )
+        z_min = np.nanmin(commandListPoints[:, 2])
+        if z_min < 0:
+            raise ZMinCollisionException(z_min) 
+            
+
+        
         
         printTofile(commandList, commandListidexOfPoints, commandListPoints )
 
@@ -43,10 +48,13 @@ class Gcode():
 
     def zBackTrans(self, commandListPoints, mesh:mesh_object.MeshObject):
         print("start - zBackTrans")
-        locations, index_ray = mesh.distortOnTrans(commandListPoints[:,:3])
+        mask = ~np.any(np.isnan(commandListPoints),axis=1)
 
-        
-        commandListPoints[index_ray, 2] = commandListPoints[index_ray, 2] -  locations[:, 2]
+        locations, index_ray = mesh.distortOnTrans(commandListPoints[mask,:3])
+
+        #commandListPoints[mask][index_ray, 2] -= locations[:, 2]
+        commandListPoints[np.where(mask)[0][index_ray], 2] -= locations[:, 2]
+        #commandListPoints[mask][index_ray, 2] = commandListPoints[mask][index_ray, 2] -  locations[:, 2]
         print("end - zBackTrans")
         return commandListPoints
 
@@ -62,3 +70,4 @@ class ZMinCollisionException(Exception):
             f"Z Min is under 0: {self.z_min}. Zozze would collide with the build plate. "
             "Check if you have the correct G-code."
         )
+

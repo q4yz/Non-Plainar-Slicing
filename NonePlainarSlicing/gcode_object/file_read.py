@@ -20,12 +20,19 @@ def readGcodeFileToDicList( file_path) -> list:
                 tokens = line.split()
                 if tokens:
                     instruction = {'command': tokens[0], 'parameters': {}}
-                    for token in tokens[1:]:
-                        try:
-                            if len(token) > 1:
-                                instruction['parameters'][token[0]] = float(token[1:])
-                        except ValueError:
-                            pass
+                    if tokens[0] == "G0" or tokens[0] =="G1":
+                        for token in tokens[1:]:
+                            try:
+                                if len(token) > 1:
+                                    instruction['parameters'][token[0]] = float(token[1:])
+                            except ValueError:
+                                pass
+                    else:
+                        instruction['parameters'] = []
+                        for token in tokens[1:]:
+                            
+                            instruction['parameters'].append(token)
+
               
                     instructions[i] = instruction
                     i += 1
@@ -33,6 +40,7 @@ def readGcodeFileToDicList( file_path) -> list:
         instructions = instructions[:i]
         
         print("end - read_gcode")
+        
         #print(instructions)
         return instructions # , combined
     except FileNotFoundError:
@@ -40,3 +48,5 @@ def readGcodeFileToDicList( file_path) -> list:
     except Exception as e:
         print(f"Error reading file: {e}")
     return None
+
+
