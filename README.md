@@ -1,4 +1,4 @@
-# None-Plainar-Slicing 
+# Non-Plainar-Slicing 
 
 ## Introduction
 This project is still in its early stage of development, so it is more a proof of concept on how G-code for non-planar printing can be generated. This project enables slicing of G-code for non-planar 3D printing. The G-code allows you to:
@@ -17,7 +17,7 @@ This project is still in its early stage of development, so it is more a proof o
 
 ## Installation
 
-Follow these steps to set up and run the None-Plainar-Slicing project.
+Follow these steps to set up and run the Non-Plainar-Slicing project.
 Prerequisites
 
 Ensure you have the following installed on your machine:
@@ -29,7 +29,7 @@ Ensure you have the following installed on your machine:
 #### 1) Clone the repository:
 Open your terminal and run the following command to clone the repository:
 
-         git clone https://github.com/q4yz/None-Plainar-Slicing.git
+         git clone https://github.com/q4yz/Non-Plainar-Slicing.git
          cd None-Plainar-Slicing
 
 #### 2) Set up a virtual environment:
@@ -50,7 +50,7 @@ With the virtual environment activated, install the required packages using pip:
 #### 5) Run the main script:
 Execute the main script to start the project:
 
-         python NonePlainarSlicing/main.py
+         python NonPlainarSlicing/main.py
 
 #### Notes
 Ensure your terminal is in the None-Plainar-Slicing directory when running the commands.
