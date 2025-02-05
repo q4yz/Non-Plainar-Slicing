@@ -2,7 +2,7 @@
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), r"..\NonePlainarSlicing")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), r"..\NonPlainarSlicing")))
 
 
 print(sys.path)

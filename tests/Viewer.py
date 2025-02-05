@@ -1,7 +1,7 @@
 ### Example Unit Test (tests/Viewer.py):
 ```python
 import unittest
-from Transformer_v2.Viewer import Viewer
+from NonPlainarSlicing.Viewer import Viewer
 
 class TestViewer(unittest.TestCase):
 
