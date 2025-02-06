@@ -3,13 +3,13 @@
 import tkinter as tk
 from tkinter import messagebox
 
-from Constants import *
 import configparser
 
 # Example dictionary
-default_settings  = {'Max P': 30, 'MaxDistortionHight': 0.2, 'DistortionResolution': 0.25, 'Test Parm3': 10, 'Test Parm5': 3, 'Test Parm7': 20}
+default_settings  = {'max_p': 30, 'maxdistortionhight': 0.2, 'distortionresolution': 0.25, 'test_parm3': 10, 'test_parm5': 3, 'test_parm7': 20}
 
 def load_settings(file_path, default_settings):
+    print("laod")
     """Load settings from an .ini file, updating the defaults with the file's values."""
     config = configparser.ConfigParser()
     config.read(file_path)

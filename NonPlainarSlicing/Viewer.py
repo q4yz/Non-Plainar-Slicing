@@ -14,7 +14,7 @@ import trimesh
 import os
 from canvisViewer import CanvisViewer
 import mesh_object
-from Constants import *
+
 from ViewerMethoden import *
 from settings import *
 
@@ -59,7 +59,7 @@ class Viewer(ViewerMethoden):
             ("Import Gcode", self.importGcode, 1, 5),
             ("Export Gcode", self.exportGcode, 1, 7),
             ("Split", self.split, 1, 1),
-            ("Slop", self.transTransformerPlain, 1, 2),
+            ("Slope", self.transTransformerPlain, 1, 2),
             ("Distort", self.distort, 1, 3),
         ]
 

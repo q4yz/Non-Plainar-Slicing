@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
-from Constants import *
+#import globals
 
 class CanvisViewer():
     """

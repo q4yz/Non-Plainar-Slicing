@@ -18,7 +18,7 @@ from tkinter import messagebox
 import logging
 from threading import Thread
 import os
-from Constants import *
+import globals
 from settings import *
 
 class ViewerMethoden():
@@ -47,8 +47,8 @@ class ViewerMethoden():
 
         self.busy = True
 
-        global progress
-        progress = 0
+        
+        globals.progress = 0
 
         t = Thread(target=self._run_and_complete, args=(target_method, *args))
         t.start()
@@ -59,8 +59,8 @@ class ViewerMethoden():
             target_method(*args) 
         finally:
             self.busy = False  
-            global progress
-            progress = 1
+            
+            globals.progress = 1
 
 
 
@@ -98,10 +98,10 @@ class ViewerMethoden():
     def _load_obj(self):    
          
         logging.info("----Button Slop Pressed----") 
-        global progress
+        
         totallSteps = 2
         step = 0
-        progress = step / totallSteps
+        globals.progress = step / totallSteps
 
         file_path = tkinter.filedialog.askopenfile(mode='r',
         initialdir=r'C:\Daten\Test-Slicer\OBJ_IN', 
@@ -112,21 +112,21 @@ class ViewerMethoden():
 
             
             step += 1
-            progress = step / totallSteps
+            globals.progress = step / totallSteps
 
             print("Selected file:", file_path.name)
             file_path.close()  
             self.meshObject = mesh_object.MeshObject(path = file_path.name, viewer = self.OBJ_Canvas )
 
-            maxP = settings['Max P']
-            distortionResolution = settings['DistortionResolution']
+            maxP = settings['max_p']
+            distortionResolution = settings['distortionresolution']
             self.meshObject.createTransformerPlain(distortionResolution, maxP)
 
             
             
             self.state = 1
-
-        progress = 1
+        globals.progress = 1
+        
 
         
     
@@ -166,7 +166,7 @@ class ViewerMethoden():
             selectedPath:str = file_path.name
             file_path.close()  
 
-            self.meshObject.gcode = gcode_object.Gcode(selectedPath,self.meshObject)
+            self.meshObject.gcode = gcode_object.Gcode(selectedPath,self.meshObject, 0.5)
 
         self.state = 6
  
@@ -198,6 +198,8 @@ class ViewerMethoden():
 
     def _split(self):
         logging.info("----Button Split Pressed----") 
+
+        
         self.meshObject.splitMeshEdageOnTrans()    
         self.state = 2
       
@@ -224,7 +226,7 @@ class ViewerMethoden():
         label.pack(pady=10)
 
         # Add buttons for the three options
-        button1 = tk.Button(root, text="slop", command=lambda: option_selected(1))
+        button1 = tk.Button(root, text="Slope", command=lambda: option_selected(1))
         button1.pack(pady=5)
         button2 = tk.Button(root, text="FlatSurface", command=lambda: option_selected(2))
         button2.pack(pady=5)
@@ -272,8 +274,8 @@ class ViewerMethoden():
         while not self.kill:
             
  
-            global progress
-            p = progress * 100
+            
+            p = globals.progress  * 100
         
             self.progressbar['value'] = p
             sleep(0.01)

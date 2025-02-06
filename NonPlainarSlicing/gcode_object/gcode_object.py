@@ -7,26 +7,27 @@ from .utils import *
 from .file_read import *
 from .file_write import *
 
+import globals
+
 
 class Gcode():
 
     outCommands = []
     offset = []
 
-    def __init__(self, path, meshobject) -> None:
-        
-        #path = r'C:\Daten\Test-Slicer\Gcode_IN\CFFFP_out.gcode'
+    def __init__(self, path : str, meshobject , l: float) -> None:
+       
 
         commandList = readGcodeFileToDicList(path)
-        
+        globals.progress = 0.1
         commandListidexOfPoints, commandListPoints, maskIsMesh = getPointsFromCommands(commandList)
-        print(commandListPoints)
+        globals.progress = 0.2
         offset = getOffsetFormOrigan(commandList, commandListidexOfPoints[maskIsMesh], commandListPoints[maskIsMesh])
-        print("off")
-        commandListidexOfPoints, commandListPoints = segmentizeLines(commandListidexOfPoints, commandListPoints, 0.5)    
-
+        globals.progress = 0.3
+        commandListidexOfPoints, commandListPoints = segmentizeLines(commandListidexOfPoints, commandListPoints,l)    
+        globals.progress = 0.4
         shiftPoints(commandListPoints, -offset )
-
+        globals.progress = 0.5
         commandListPoints = self.zBackTrans(commandListPoints, meshobject)
         print("z min")
         z_min = np.nanmin(commandListPoints[:, 2])
@@ -34,14 +35,14 @@ class Gcode():
         offset[2] =  -z_min +0.3
 
         shiftPoints(commandListPoints, offset )
+        globals.progress = 0.6
         z_min = np.nanmin(commandListPoints[:, 2])
         if z_min < 0:
             raise ZMinCollisionException(z_min) 
-            
 
         
-        
         printTofile(commandList, commandListidexOfPoints, commandListPoints )
+        globals.progress = 0.9
 
     
 

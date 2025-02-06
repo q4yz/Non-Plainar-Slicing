@@ -5,7 +5,7 @@ from .utils import checkForVerticesOnPlain
 from .transformation import rotate_to_align
 
 
-def multisplit(mesh: trimesh.Trimesh, normal, steps):
+def multisplit(mesh: trimesh.Trimesh, normal, steps : np.array):
     """
     Rotates the mesh so the normal aligns with (0, 0, z),
     translates it to the starting position, and applies `splitFacesOnZZero` 
@@ -13,10 +13,10 @@ def multisplit(mesh: trimesh.Trimesh, normal, steps):
     """
     # Rotate the mesh to align the normal with (0, 0, 1)
 
-    rotation_matrix = rotate_to_align(normal, target=(0, 0, 1))
+    rotation_matrix : np.array =  rotate_to_align(normal, target=(0, 0, 1))
     mesh.apply_transform(rotation_matrix)
 
-    applyedOffset = 0
+    applyedOffset : float = 0
     
     
     for step in steps:
@@ -41,8 +41,8 @@ def multisplit(mesh: trimesh.Trimesh, normal, steps):
 
 def splitFacesOnZZero(mesh:trimesh.Trimesh) -> trimesh.Trimesh: 
 
-    old_v = mesh.vertices
-    old_f = mesh.faces
+    old_v : np.array = mesh.vertices
+    old_f : np.array = mesh.faces
     old_v = np.array(old_v)
 
     if checkForVerticesOnPlain(old_v):

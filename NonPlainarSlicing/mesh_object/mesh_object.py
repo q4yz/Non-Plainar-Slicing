@@ -1,3 +1,4 @@
+from ast import Constant
 import trimesh
 
 from tkinter import messagebox
@@ -6,6 +7,7 @@ import mesh_utils
 from .transformer_plane import TransformerPlain
 
 import numpy as np
+import globals
 
 
 class MeshObject():
@@ -58,14 +60,7 @@ class MeshObject():
         else:
             raise ValueError("Either 'path' or both 'v' and 'f' must be provided.")
 
-
-
-       
         self.shiftToCenter()
-
-        #maxP = settings['Max P']
-        #distortionResolution = settings['DistortionResolution']
-        #self.createTransformerPlain(distortionResolution, maxP)
 
         self.viewer.view_obj(self.mesh)
         self.viewer.canvas.draw()
@@ -98,9 +93,11 @@ class MeshObject():
         -------
         None
         """
+        
+        globals.progress = 0.1
 
         mesh = self.mesh
-
+ 
         x_coords = self.transformerPlain.mesh.vertices[:, 0]  # Get the first column (x-coordinates)
         y_coords = self.transformerPlain.mesh.vertices[:, 1]  # Get the first column (x-coordinates)
         
@@ -109,14 +106,17 @@ class MeshObject():
         unique_x_coords = [x + 0.00001 for x in unique_x_coords]
         mesh = mesh_utils.multisplit(mesh, normal, unique_x_coords)
 
+        globals.progress = 0.3
+        
+
         unique_y_coords = np.unique(y_coords)
         normal = [0, 1, 0]        
         unique_y_coords = [y + 0.0001 for y in unique_y_coords]
-        mesh = mesh_utils.multisplit(mesh, normal, unique_y_coords)
+        self.mesh = mesh_utils.multisplit(mesh, normal, unique_y_coords)
        
-        normal = [1, 1, 0]        
-        unique_xy_coords = [x*2**(0.5) + 0.000001 for x in unique_x_coords]
-        self.mesh = mesh_utils.multisplit(mesh, normal, unique_xy_coords)
+        #normal = [1, 1, 0]        
+        #unique_xy_coords = [x*2**(0.5) + 0.000001 for x in unique_x_coords]
+        #self.mesh = mesh_utils.multisplit(mesh, normal, unique_xy_coords)
 
         self.viewer.view_obj(self.mesh)
         self.viewer.canvas.draw()
@@ -144,9 +144,7 @@ class MeshObject():
     def xSlop(self):
         k = 0.5
         transMesh = self.transformerPlain.mesh
-        bounding_box = transMesh.bounds
-       
-        x_min = bounding_box[0][0]  
+        
         for v in transMesh.vertices:
                 v[2] = v[0] * k  
             
@@ -171,11 +169,11 @@ class MeshObject():
         for unique_index in unique_indices:
             maskSub = index_ray == unique_index
             subset = locations[maskSub]
-            # Get the local index of the max Z value
+            
             local_max_index = np.argmax(subset[:, 2])
-            # Map the local index to the global index
+            
             global_max_index = np.where(maskSub)[0][local_max_index]
-            # Set the corresponding global index in the mask to True
+            
             mask[global_max_index] = True
 
         #mask = np.diff(index_ray, prepend=index_ray[0] - 1) != 0
@@ -217,8 +215,6 @@ class MeshObject():
         locations, index_ray , index_tri  = self.mesh.ray.intersects_location(ray_origin, ray_direction)
        
         zDefault = np.full(len(v), 10000)
-
-        # Store results
         
         unique_indices = np.unique(index_ray)
         mask = np.full(len(locations), False)

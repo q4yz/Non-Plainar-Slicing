@@ -1,11 +1,11 @@
 import trimesh
 
-import mesh_utils
-#from Split import *  
+
+
 
 import numpy as np
 import logging
-from Constants import *
+
 
 class TransformerPlain():
 
