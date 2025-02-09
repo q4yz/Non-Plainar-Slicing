@@ -1,7 +1,8 @@
 
 import logging
-from Viewer import Viewer
+
 import numpy as np
+from Pytq5_inferface_test import *
 
 # Configure logging
 logging.basicConfig(level=logging.INFO,
@@ -16,4 +17,7 @@ logging.basicConfig(level=logging.INFO,
 np.set_printoptions(precision=4, suppress=True, edgeitems=8)  
 
 if __name__ == "__main__":
-    Viewer()
+    app = QtWidgets.QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())

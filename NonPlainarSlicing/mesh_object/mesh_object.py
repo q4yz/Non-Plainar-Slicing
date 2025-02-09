@@ -1,14 +1,17 @@
-from ast import Constant
+
 import trimesh
-
+import pyvista as pv
 from tkinter import messagebox
-
+from PyQt5.QtCore import QTimer
 import mesh_utils
 from .transformer_plane import TransformerPlain
-
+from PyQt5.QtCore import QMetaObject, Qt
 import numpy as np
 import globals
 
+
+
+   
 
 class MeshObject():
     """
@@ -21,7 +24,7 @@ class MeshObject():
     """
     mesh = None
     transformerPlain = None
-    viewer = None
+
 
     gcode = None
     path = None
@@ -47,7 +50,7 @@ class MeshObject():
         None
         """
 
-        self.viewer = parameters["viewer"]
+       
 
         if 'path' in parameters:
             self.path = parameters['path']
@@ -62,10 +65,6 @@ class MeshObject():
 
         self.shiftToCenter()
 
-        self.viewer.view_obj(self.mesh)
-        self.viewer.canvas.draw()
-        
-
        
     def shiftToCenter(self):
         v_min, v_max = self.mesh.bounding_box.bounds
@@ -75,12 +74,9 @@ class MeshObject():
         
         
     def createTransformerPlain(self, resolution, maxP):
-        self.transformerPlain = TransformerPlain(self.mesh.bounding_box.bounds,resolution,maxP, self.viewer)
+        self.transformerPlain = TransformerPlain(self.mesh.bounding_box.bounds,resolution,maxP)
 
 
-        
-        self.viewer.view_transformer(self.transformerPlain.mesh)
-        self.viewer.canvas.draw()
 
     def splitMeshEdageOnTrans(self):
         """
@@ -94,7 +90,7 @@ class MeshObject():
         None
         """
         
-        globals.progress = 0.1
+        
 
         mesh = self.mesh
  
@@ -106,20 +102,15 @@ class MeshObject():
         unique_x_coords = [x + 0.00001 for x in unique_x_coords]
         mesh = mesh_utils.multisplit(mesh, normal, unique_x_coords)
 
-        globals.progress = 0.3
+        
         
 
         unique_y_coords = np.unique(y_coords)
         normal = [0, 1, 0]        
         unique_y_coords = [y + 0.0001 for y in unique_y_coords]
         self.mesh = mesh_utils.multisplit(mesh, normal, unique_y_coords)
-       
-        #normal = [1, 1, 0]        
-        #unique_xy_coords = [x*2**(0.5) + 0.000001 for x in unique_x_coords]
-        #self.mesh = mesh_utils.multisplit(mesh, normal, unique_xy_coords)
 
-        self.viewer.view_obj(self.mesh)
-        self.viewer.canvas.draw()
+
 
     def distort(self):
         mesh = self.mesh
@@ -127,8 +118,9 @@ class MeshObject():
         locations, index_ray = self.distortOnTrans(v)
        
         v[index_ray, 2] = v[index_ray, 2] +  locations[:, 2]
-        self.viewer.view_obj( self.mesh)
-        self.viewer.canvas.draw()
+
+
+
     def distortOnTrans(self, v):
         
         transformer_mesh = self.transformerPlain.mesh
@@ -148,8 +140,7 @@ class MeshObject():
         for v in transMesh.vertices:
                 v[2] = v[0] * k  
             
-        self.viewer.view_transformer(transMesh)
-        self.viewer.canvas.draw()
+
    
     def flattop(self):
         print("flaten")
@@ -194,15 +185,16 @@ class MeshObject():
         zMin = np.min( v[:, 2])
         v[:, 2] = v[:, 2] - zMin
         resolution = self.transformerPlain.resolution
+
+
+
         maxP = self.transformerPlain.maxP
         maxP_radians = np.radians(maxP)
         k = np.arctan(maxP_radians) / resolution
 
-        transMesh = mesh_utils.smoothMesh(transMesh, k)
+        transMesh = mesh_utils.smoothMesh(transMesh, maxP)
         self.transformerPlain.mesh = transMesh
         
-        self.viewer.view_transformer(transMesh)
-        self.viewer.canvas.draw()
 
 
     def noSupport(self):
@@ -240,11 +232,9 @@ class MeshObject():
         maxP_radians = np.radians(maxP)
         k = np.arctan(maxP_radians) / resolution
 
-        transMesh = mesh_utils.smoothMesh(transMesh, k)
+        transMesh = mesh_utils.smoothMesh(transMesh, maxP)
         self.transformerPlain.mesh = transMesh
 
-        self.viewer.view_transformer(transMesh)
-        self.viewer.canvas.draw()
 
 
      

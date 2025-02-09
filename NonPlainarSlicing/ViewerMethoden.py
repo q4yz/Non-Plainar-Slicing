@@ -1,5 +1,5 @@
 
-from time import sleep
+
 import tkinter as tk
 import tkinter
 from tkinter import filedialog
@@ -9,17 +9,24 @@ import mesh_object
 import gcode_object
 
 
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
-# Implement the default Matplotlib key bindings.
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.figure import Figure
+
 from tkinter import messagebox
 import logging
 from threading import Thread
 import os
 import globals
 from settings import *
+import numpy as np
+
+import pyvista as pv
+from PyQt5.QtCore import QMetaObject, Qt, QObject, pyqtSlot, pyqtSignal, QThread
+from time import sleep
+import time
+#import subprocess
+
+#subprocess.run(["C:\\path\\to\\slic3r.exe"])
+
+
 
 class ViewerMethoden():
     """
@@ -61,14 +68,19 @@ class ViewerMethoden():
             self.busy = False  
             
             globals.progress = 1
+            if hasattr(self, 'meshObject'):          
+                self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
+
+                if hasattr(self.meshObject, 'transformerPlain'):
+                    self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
 
 
 
     def load_obj(self):
         self._run_in_thread(0, 10, self._load_obj);
 
-    #def run(self):
-    #    self._run_in_thread(1,self._run);
+    def run(self):
+        self._run_in_thread(0,10,self._run);
 
     def exportMesh(self):
         self._run_in_thread(4,10, self._exportMesh);
@@ -79,9 +91,6 @@ class ViewerMethoden():
     def exportGcode(self):
         self._run_in_thread(7,10, self._exportGcode);
 
-    #def transform_Gcode(self):
-    #    self._run_in_thread(6,self._transform_Gcode);
-
     def split(self):
         self._run_in_thread(1,1, self._split);
 
@@ -90,10 +99,6 @@ class ViewerMethoden():
 
     def distort(self):
         self._run_in_thread(3,3,self._distort);
-
-    #def slice(self):
-    #    self._run_in_thread(4,self._slice);
-    
            
     def _load_obj(self):    
          
@@ -101,7 +106,7 @@ class ViewerMethoden():
         
         totallSteps = 2
         step = 0
-        globals.progress = step / totallSteps
+        globals.progress2 = step / totallSteps
 
         file_path = tkinter.filedialog.askopenfile(mode='r',
         initialdir=r'C:\Daten\Test-Slicer\OBJ_IN', 
@@ -112,11 +117,11 @@ class ViewerMethoden():
 
             
             step += 1
-            globals.progress = step / totallSteps
+            globals.progress2 = step / totallSteps
 
             print("Selected file:", file_path.name)
             file_path.close()  
-            self.meshObject = mesh_object.MeshObject(path = file_path.name, viewer = self.OBJ_Canvas )
+            self.meshObject = mesh_object.MeshObject(path = file_path.name )
 
             maxP = settings['max_p']
             distortionResolution = settings['distortionresolution']
@@ -125,17 +130,37 @@ class ViewerMethoden():
             
             
             self.state = 1
-        globals.progress = 1
+        globals.progress2 = 1
         
 
-        
-    
+    def _run(self):
+        globals.progress = 0.05
 
-    #def _run(self):
-    #    self._split()
-    #    self._transTransformerPlain()
-    #    self._distort()
-    #    self.state = 4
+        self._load_obj()
+        globals.progress = 0.2
+        if not hasattr(self, 'meshObject'):  
+            return
+        
+        self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
+        self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
+                
+                    
+        self._split()
+        globals.progress = 0.4
+        self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
+        self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
+
+        self._transTransformerPlain()
+        globals.progress = 0.6
+        self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
+        self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
+
+
+        self._distort()
+        globals.progress = 0.8
+
+
+        self.state = 4
 
  
     def _exportMesh(self):
@@ -190,7 +215,6 @@ class ViewerMethoden():
             self.meshObject.gcode.export(path)
 
             #save_file_path.write(self.meshObject.gcodePreTransformed)
-            
 
 
         self.state = 8
@@ -262,23 +286,17 @@ class ViewerMethoden():
             self.root.quit()     
             self.root.destroy()  
 
-    def _progress(self):
-        t = Thread(target=self.action_progress, args=[])
-        t.start()
+class WorkerThread(QThread):
+    progress_signal1 = pyqtSignal(int)  # First progress bar signal
+    progress_signal2 = pyqtSignal(int)  # Second progress bar signal
 
-    def on_key_press(self, event):
-        return
-      
-    def action_progress(self):
-
-        while not self.kill:
-            
- 
-            
-            p = globals.progress  * 100
-        
-            self.progressbar['value'] = p
-            sleep(0.01)
-
+    def run(self):
+        while not self.isInterruptionRequested():  # Thread-safe exit condition
+            p1 = globals.progress * 100
+            p2 = globals.progress2 * 100
+            self.progress_signal1.emit(int(p1))  # Emit progress for first bar
+            self.progress_signal2.emit(int(p2))  # Emit progress for second bar
+            sleep(0.01)  # Prevent CPU overuse
             
        
+    

@@ -13,9 +13,10 @@ class TransformerPlain():
     boundingbox = None
     resolution = None
 
-    viewer = None
 
-    def __init__(self, boundingbox, resolution,maxP, viewer) -> None:
+
+
+    def __init__(self, boundingbox, resolution,maxP) -> None:
         """
         Initialize the YourClass object.
 
@@ -28,7 +29,7 @@ class TransformerPlain():
         -------
         None
         """
-        self.viewer = viewer
+
         self.boundingbox = boundingbox
         self.resolution = resolution
         self.maxP = maxP
