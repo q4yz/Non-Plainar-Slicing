@@ -25,7 +25,7 @@ from time import sleep
 import subprocess
 import tempfile
 import trimesh
-
+from pathlib import Path
 
 
 class ViewerMethoden():
@@ -142,8 +142,6 @@ class ViewerMethoden():
             return
 
         
-
-        
         self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
         self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
 
@@ -158,8 +156,6 @@ class ViewerMethoden():
         self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
         self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
 
-      
-
 
         self._distort()
         globals.progress = 0.8
@@ -172,9 +168,6 @@ class ViewerMethoden():
         self.meshObject.gcode = gcode_object.Gcode(path_gcode1,self.meshObject, 0.5)
         globals.progress = 1
 
-
-        
-
         self.state = 6
 
     def slice (self):
@@ -183,14 +176,14 @@ class ViewerMethoden():
                 
                 self.meshObject.mesh.export(temp_stl.name)  # Save mesh as STL
 
+                slic3r_path = Path("NonPlainarSlicing/Slic3r-1.3.0.64bit/Slic3r-console.exe")
 
+                slic3r_path = slic3r_path.resolve()
+                print(slic3r_path)
 
-
-                path = r"C:\Users\alber\source\repos\q4yz\None-Plainar-Slicing\NonPlainarSlicing\Slic3r-1.3.0.64bit\Slic3r-console.exe"
-                # Run Slic3r
                 output_gcode = temp_stl.name.replace(".stl", ".gcode")
                 subprocess.run([
-                    path,
+                    slic3r_path,
                     temp_stl.name,
                     "--output", output_gcode,
                     "--start-gcode", "SET_GCODE_VARIABLE MACRO=START_PRINT VARIABLE=bed_temp VALUE=[first_layer_bed_temperature]\nSET_GCODE_VARIABLE MACRO=START_PRINT VARIABLE=extruder_temp VALUE=[first_layer_temperature]\nSTART_PRINT",
@@ -200,15 +193,11 @@ class ViewerMethoden():
                     "--external-perimeters-first","1",
                     "--before-layer-gcode", ";LAYER:[layer_num]",
                     "--first-layer-height"," 0.3488"
-                    
-                    
-                
                 ], creationflags=subprocess.CREATE_NO_WINDOW)
 
                 print(f"Generated G-code: {output_gcode}")
                 return output_gcode
-            #subprocess.run([r".\Slic3r-1.3.0.64bit\Slic3r-console.exe"])
-
+        
     
     def _exportMesh(self):
 
@@ -243,10 +232,6 @@ class ViewerMethoden():
         self.state = 6
  
 
-    #def _transform_Gcode(self):
-    #    self.state = 7
-   
-
     def _exportGcode(self):
         save_file_path = filedialog.asksaveasfile(
                 mode='w',
@@ -259,13 +244,8 @@ class ViewerMethoden():
         if save_file_path: 
             path = save_file_path
             save_file_path.close()
-
-
-
-
             gcode_object.export(path.name,self.meshObject.gcode.gcode_out )
-            #save_file_path.write(self.meshObject.gcodePreTransformed)
-
+            
 
         self.state = 8
    
