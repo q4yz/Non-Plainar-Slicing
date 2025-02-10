@@ -1,19 +1,26 @@
 
 
 import numpy as np
-
+import globals
 def readGcodeFileToDicList( file_path) -> list:
     print("start - read_gcode")
+    
     try:
         instructions = []
         i = 0
         with open(file_path, 'r') as file:
+            
             lines = file.readlines()  # Read all lines into a list
             instructions = [None] * len(lines)  # Create a list of None with the same length
 
+            totall_steps = len(lines)
+            steps = 0
             
             for line in lines:
                 #line = line.split(';')[0].strip()
+                globals.progress = steps / float(totall_steps)
+                steps += 1
+
                 if not line:
                     continue
 

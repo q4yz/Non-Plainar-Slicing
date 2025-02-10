@@ -1,7 +1,8 @@
 
 import numpy as np
+import globals
 
-def printTofile( commandList, pointsIndex, pointList):
+def toGcodeList( commandList, pointsIndex, pointList):
         print("start - printTofile")
         outCommands = np.empty(len(commandList) + len(pointList), dtype='U256')
         print(len(pointsIndex))
@@ -10,8 +11,11 @@ def printTofile( commandList, pointsIndex, pointList):
         indexPointList = np.hstack([pointsIndex_reshaped, pointList])
         v_last = [-1,-1,-1,-1]
         commandWriteIndex = 0
+
+        totall_steps = len(commandList)
         for i , c in enumerate(commandList):
-        
+            globals.progress2 = i/float(totall_steps)
+
             if c['command'] == 'G1' :
 
                 mask = indexPointList[:,0] == i
@@ -67,8 +71,12 @@ def printTofile( commandList, pointsIndex, pointList):
         outCommands = outCommands[:commandWriteIndex]
         
   
-        file_path = "C:\Daten\Test-Slicer\Gcode_OUT\out.gcode"
-        export(file_path, outCommands)
+        
+        
+        #export(file_path, outCommands)
+        
+        globals.progress2 = 1
+        return outCommands
 
 def export ( path, outCommands):
     

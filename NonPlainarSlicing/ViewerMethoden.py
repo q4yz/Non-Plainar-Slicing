@@ -9,7 +9,7 @@ import mesh_object
 import gcode_object
 
 
-
+from trimesh.smoothing import filter_laplacian
 from tkinter import messagebox
 import logging
 from threading import Thread
@@ -21,10 +21,10 @@ import numpy as np
 import pyvista as pv
 from PyQt5.QtCore import QMetaObject, Qt, QObject, pyqtSlot, pyqtSignal, QThread
 from time import sleep
-import time
-#import subprocess
 
-#subprocess.run(["C:\\path\\to\\slic3r.exe"])
+import subprocess
+import tempfile
+import trimesh
 
 
 
@@ -89,7 +89,7 @@ class ViewerMethoden():
         self._run_in_thread(5,10, self._importGcode); 
 
     def exportGcode(self):
-        self._run_in_thread(7,10, self._exportGcode);
+        self._run_in_thread(6,10, self._exportGcode);
 
     def split(self):
         self._run_in_thread(1,1, self._split);
@@ -140,29 +140,76 @@ class ViewerMethoden():
         globals.progress = 0.2
         if not hasattr(self, 'meshObject'):  
             return
+
         
+
+        
+        self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
+        self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
+
+        self._transTransformerPlain()
+        globals.progress = 0.4
         self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
         self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
                 
                     
         self._split()
-        globals.progress = 0.4
-        self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
-        self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
-
-        self._transTransformerPlain()
         globals.progress = 0.6
         self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
         self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
 
+      
+
 
         self._distort()
         globals.progress = 0.8
+        self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
+        self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
+       
+        path_gcode1 = self.slice()
+     
+
+        self.meshObject.gcode = gcode_object.Gcode(path_gcode1,self.meshObject, 0.5)
+        globals.progress = 1
 
 
-        self.state = 4
+        
 
- 
+        self.state = 6
+
+    def slice (self):
+        with tempfile.NamedTemporaryFile(suffix=".stl", delete=False) as temp_stl:
+                filter_laplacian(self.meshObject.mesh, lamb=0.1, iterations=10) 
+                
+                self.meshObject.mesh.export(temp_stl.name)  # Save mesh as STL
+
+
+
+
+                path = r"C:\Users\alber\source\repos\q4yz\None-Plainar-Slicing\NonPlainarSlicing\Slic3r-1.3.0.64bit\Slic3r-console.exe"
+                # Run Slic3r
+                output_gcode = temp_stl.name.replace(".stl", ".gcode")
+                subprocess.run([
+                    path,
+                    temp_stl.name,
+                    "--output", output_gcode,
+                    "--start-gcode", "SET_GCODE_VARIABLE MACRO=START_PRINT VARIABLE=bed_temp VALUE=[first_layer_bed_temperature]\nSET_GCODE_VARIABLE MACRO=START_PRINT VARIABLE=extruder_temp VALUE=[first_layer_temperature]\nSTART_PRINT",
+                    "--end-gcode", "END_PRINT",
+                    "--first-layer-bed-temperature", "50",
+                    "--skirts", "0",
+                    "--external-perimeters-first","1",
+                    "--before-layer-gcode", ";LAYER:[layer_num]",
+                    "--first-layer-height"," 0.3488"
+                    
+                    
+                
+                ], creationflags=subprocess.CREATE_NO_WINDOW)
+
+                print(f"Generated G-code: {output_gcode}")
+                return output_gcode
+            #subprocess.run([r".\Slic3r-1.3.0.64bit\Slic3r-console.exe"])
+
+    
     def _exportMesh(self):
 
         save_file_path = filedialog.asksaveasfile(
@@ -212,8 +259,11 @@ class ViewerMethoden():
         if save_file_path: 
             path = save_file_path
             save_file_path.close()
-            self.meshObject.gcode.export(path)
 
+
+
+
+            gcode_object.export(path.name,self.meshObject.gcode.gcode_out )
             #save_file_path.write(self.meshObject.gcodePreTransformed)
 
 
@@ -258,8 +308,10 @@ class ViewerMethoden():
         button3.pack(pady=5)
 
         root.mainloop()
+        #option_selected(1)
         
         self.state = 3
+         
 
 
     def _distort(self):
@@ -299,4 +351,3 @@ class WorkerThread(QThread):
             sleep(0.01)  # Prevent CPU overuse
             
        
-    

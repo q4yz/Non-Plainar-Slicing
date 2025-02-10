@@ -143,7 +143,6 @@ class MeshObject():
 
    
     def flattop(self):
-        print("flaten")
         
         transMesh = self.transformerPlain.mesh
         v =  transMesh.vertices
@@ -172,7 +171,7 @@ class MeshObject():
 
         index_ray = index_ray[mask]
         locations = locations[mask]
-        print(locations)
+        
 
         
         if locations.size != 0:
@@ -223,6 +222,7 @@ class MeshObject():
 
         v[:, 2] = zDefault
         v[index_ray, 2] = locations[:, 2]
+        v[:, 2] =np.where(v[:, 2] < 0.1, 0, 10000 ) 
 
         zMin = np.min( v[:, 2])
         v[:, 2] = v[:, 2] - zMin

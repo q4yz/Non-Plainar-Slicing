@@ -50,53 +50,57 @@ class MainWindow(QtWidgets.QMainWindow,ViewerMethoden):
         self.update_mesh_signal.connect(self.update_mesh)
 
         self.setWindowTitle("NonPlainarSlicer")
-        self.resize(800, 600)
+        #self.resize(800, 600)
+        self.showMaximized()
+        
 
         icon_path = os.path.abspath("icon.ico")
         self.setWindowIcon(QIcon(icon_path))
         self.setWindowIcon(QIcon('path_to_your_icon.ico'))  # Provide your icon path here
-
+        
         # Create a central widget with a vertical layout.
         central_widget = QtWidgets.QWidget(self)
         self.setCentralWidget(central_widget)
         vlayout = QtWidgets.QVBoxLayout(central_widget)
 
         # Add a label at the top.
-        self.label = QtWidgets.QLabel("PyVista 3D Viewer Embedded in PyQt5", self)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        vlayout.addWidget(self.label)
+        if False:
 
-        layout_dev_op_button = QtWidgets.QHBoxLayout()
-        vlayout.addLayout(layout_dev_op_button)
+            self.label = QtWidgets.QLabel("Debbug Options", self)
+            self.label.setAlignment(QtCore.Qt.AlignCenter)
+            vlayout.addWidget(self.label)
+
+            layout_dev_op_button = QtWidgets.QHBoxLayout()
+            vlayout.addLayout(layout_dev_op_button)
 
 
-        self.load_stl_button = QtWidgets.QPushButton("Load file")
-        self.load_stl_button.clicked.connect(self.load_obj)
-        layout_dev_op_button.addWidget(self.load_stl_button)
+            self.load_stl_button = QtWidgets.QPushButton("Load file")
+            self.load_stl_button.clicked.connect(self.load_obj)
+            layout_dev_op_button.addWidget(self.load_stl_button)
 
-        self.split_mesh_button = QtWidgets.QPushButton("Split Mesh")
-        self.split_mesh_button.clicked.connect(self.split)
-        layout_dev_op_button.addWidget(self.split_mesh_button)
+            self.split_mesh_button = QtWidgets.QPushButton("Split Mesh")
+            self.split_mesh_button.clicked.connect(self.split)
+            layout_dev_op_button.addWidget(self.split_mesh_button)
 
-        self.trans_plain_button = QtWidgets.QPushButton("Transform Plain")
-        self.trans_plain_button.clicked.connect(self.transTransformerPlain)
-        layout_dev_op_button.addWidget(self.trans_plain_button)
+            self.trans_plain_button = QtWidgets.QPushButton("Transform Plain")
+            self.trans_plain_button.clicked.connect(self.transTransformerPlain)
+            layout_dev_op_button.addWidget(self.trans_plain_button)
 
-        self.distort_mesh_button = QtWidgets.QPushButton("Distort Mesh")
-        self.distort_mesh_button.clicked.connect(self.distort)
-        layout_dev_op_button.addWidget(self.distort_mesh_button)
+            self.distort_mesh_button = QtWidgets.QPushButton("Distort Mesh")
+            self.distort_mesh_button.clicked.connect(self.distort)
+            layout_dev_op_button.addWidget(self.distort_mesh_button)
 
-        self.export_mesh_button = QtWidgets.QPushButton("Export Mesh")
-        self.export_mesh_button.clicked.connect(self.exportMesh)
-        layout_dev_op_button.addWidget(self.export_mesh_button)
+            self.export_mesh_button = QtWidgets.QPushButton("Export Mesh")
+            self.export_mesh_button.clicked.connect(self.exportMesh)
+            layout_dev_op_button.addWidget(self.export_mesh_button)
 
-        self.import_gcode_button = QtWidgets.QPushButton("Import Gcode")
-        self.import_gcode_button.clicked.connect(self.importGcode)
-        layout_dev_op_button.addWidget(self.import_gcode_button)
+            self.import_gcode_button = QtWidgets.QPushButton("Import Gcode")
+            self.import_gcode_button.clicked.connect(self.importGcode)
+            layout_dev_op_button.addWidget(self.import_gcode_button)
 
-        self.save_code_button = QtWidgets.QPushButton("Save Gcode")
-        self.save_code_button.clicked.connect(self.exportGcode)
-        layout_dev_op_button.addWidget(self.save_code_button)
+            self.save_code_button = QtWidgets.QPushButton("Save Gcode")
+            self.save_code_button.clicked.connect(self.exportGcode)
+            layout_dev_op_button.addWidget(self.save_code_button)
 
 
         layout_top_button = QtWidgets.QHBoxLayout()
@@ -104,13 +108,16 @@ class MainWindow(QtWidgets.QMainWindow,ViewerMethoden):
 
         layout_top_button
 
+
+        self.settings_button = QtWidgets.QPushButton("Settings")
+        self.settings_button.clicked.connect(create_table_window)
+        layout_top_button.addWidget(self.settings_button)
+
         self.load_stl_button = QtWidgets.QPushButton("Load file")
         self.load_stl_button.clicked.connect(self.run)
         layout_top_button.addWidget(self.load_stl_button)
 
-        #self.load_stl_button = QtWidgets.QPushButton("Auto Slicing")
-        #self.load_stl_button.clicked.connect(self.add_sphere)
-        #layout_top_button.addWidget(self.load_stl_button)
+   
 
 
         self.progress_bar1 = QProgressBar(self)
@@ -142,15 +149,12 @@ class MainWindow(QtWidgets.QMainWindow,ViewerMethoden):
         button_layout = QtWidgets.QHBoxLayout()
         vlayout.addLayout(button_layout)
 
-        # Button to add another sphere.
-        #self.add_sphere_button = QtWidgets.QPushButton("Add Sphere")
-        #self.add_sphere_button.clicked.connect(self.add_sphere)
-        #button_layout.addWidget(self.add_sphere_button)
 
-        # Button to close the application.
-        self.close_button = QtWidgets.QPushButton("Close")
-        self.close_button.clicked.connect(self.close)
-        button_layout.addWidget(self.close_button)
+
+        self.export_gcode_button = QtWidgets.QPushButton("Save")
+        self.export_gcode_button.clicked.connect(self.exportGcode)
+        button_layout.addWidget(self.export_gcode_button)
+
 
 
         #self._progress()

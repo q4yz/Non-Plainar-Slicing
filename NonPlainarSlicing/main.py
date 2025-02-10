@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO,
                     ])
 
 # Start the Viewer
-np.set_printoptions(precision=4, suppress=True, edgeitems=8)  
+np.set_printoptions(precision=4, suppress=True, edgeitems=8, threshold=40)  
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

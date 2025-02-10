@@ -1,18 +1,14 @@
 from pickle import NONE
 from xmlrpc.client import boolean
 import numpy as np
-
-
-
+import globals
 
 def getOffsetFormOrigan (commandList, commandListidexOfPoints, commandListPoints):
 
 
     commandListPointsG1 = getG1CommandPoints(commandList, commandListidexOfPoints, commandListPoints)
-    print(commandListPointsG1)
-    mask = (commandListPointsG1[:, 0] != 0) & (commandListPointsG1[:, 1] != 0)
 
-    boundingbox =  getBoundingbox(commandListPointsG1[mask])
+    boundingbox =  getBoundingbox(commandListPointsG1)
 
     print("bounding" + str(boundingbox))
     
@@ -29,14 +25,9 @@ def getG1CommandPoints (commandList, commandListidexOfPoints, commandListPoints)
     commandListPointsG1 = commandListPoints[maskG1]
     return commandListPointsG1
 
-def getAvgCenter(listPoints):
-    avg_center = np.avg(listPoints, axis=0)
-    return avg_center
-
 def getBoundingbox(listPoints):
-    print(listPoints)
-    min_xyz = np.min(listPoints, axis=0)
-    max_xyz = np.max(listPoints, axis=0)
+    min_xyz = np.nanmin(listPoints, axis=0)
+    max_xyz = np.nanmax(listPoints, axis=0)
     boundindbox = np.vstack((min_xyz, max_xyz))
 
     return boundindbox
@@ -49,14 +40,16 @@ def getPointsFromCommands( commandList):
     commandListidexOfPoints = np.empty(len(commandList), dtype=int)
     maskIsMesh = np.empty(len(commandList), dtype=bool)
     point_count = 0 
-    currentlyMesh = False
+    currentlyMesh = True
     lastVertice = [None,None,None,None]
 
     for idx, command in enumerate(commandList):
         if command['command'].startswith(";MESH:NONMESH"):
-            currentlyMesh = False
+            #currentlyMesh = False
+            pass
         elif command['command'].startswith(";MESH:"):
-            currentlyMesh = True
+            #currentlyMesh = True
+            pass
 
         elif command['command'] == 'G1' or command['command'] == 'G0': 
             params = command.get('parameters', {})
@@ -79,66 +72,21 @@ def getPointsFromCommands( commandList):
     return commandListidexOfPoints, commandListPoints, maskIsMesh
 
 
-#def segmentizeLines(pointsIndex, pointList, threshold):
-#    print("start - segmentizeLines")
-    
-#    pointList = np.array(pointList, dtype=np.float32)  # Use float32 for better performance
-#    thresholdSqr = threshold ** 2
-#    currentXYZE = np.zeros(4, dtype=np.float32)
-
-#    estimated_size = len(pointList) * 3  # Overestimate initial size
-#    points_out = np.empty((estimated_size, 4), dtype=np.float32)
-#    index_out = np.empty(estimated_size, dtype=np.int32)
-
-#    count = 0  # Tracks the number of used elements
-
-#    for index, point in zip(pointsIndex, pointList):
-#        if count >= len(points_out):  # Resize if needed
-#            new_size = len(points_out) * 2  # Double the size
-#            points_out = np.resize(points_out, (new_size, 4))
-#            index_out = np.resize(index_out, new_size)
-
-#        if np.any(np.isnan(point)):  # Handle NaN points
-#            points_out[count] = point
-#            index_out[count] = index
-#            count += 1
-#        else:
-#            endPoint = np.where(np.isnan(point), currentXYZE, point)
-#            distanceSqr = np.sum((currentXYZE[:-1] - endPoint[:-1]) ** 2)
-
-#            num_segments = int(np.ceil(np.sqrt(distanceSqr) / threshold)) if distanceSqr > thresholdSqr else 2
-#            segment_points = np.linspace(currentXYZE, endPoint, num=num_segments)[1:]  # Exclude first point
-
-#            num_new_points = len(segment_points)
-
-#            # Resize again if needed
-#            while count + num_new_points >= len(points_out):
-#                new_size = len(points_out) * 2  # Double the size
-#                points_out = np.resize(points_out, (new_size, 4))
-#                index_out = np.resize(index_out, new_size)
-
-#            # Store new points
-#            points_out[count:count + num_new_points] = segment_points
-#            index_out[count:count + num_new_points] = index
-#            count += num_new_points
-
-#            currentXYZE = endPoint
-
-#    print("end - segmentizeLines")
-    
-#    return index_out[:count], points_out[:count]  # Trim to actual size
-
 def segmentizeLines(pointsIndex,pointList, threshold  ):
         print("start - segmentizeLines")
         pointList = np.array(pointList, dtype=np.float32)
-        print(pointList)
+      
         thresholdSqr = threshold**2
         currentXYZE = np.array([])
         points_out = np.empty((0, 4), dtype=np.float32)
         index_out = np.empty(0, dtype=np.int16)
 
-        for index, point in zip(pointsIndex,pointList):
+        step = 0
+        totall_steps = len(pointsIndex)
 
+        for index, point in zip(pointsIndex,pointList):
+            globals.progress2 = step / float(totall_steps)
+            step+= 1
             if np.any(np.isnan(point)):
                 points_out = np.vstack((points_out, (point)))
                 index_out = np.append( index_out ,np.full(1,index))
@@ -160,7 +108,7 @@ def segmentizeLines(pointsIndex,pointList, threshold  ):
                 points_out = np.vstack((points_out, np.linspace(currentXYZE, endPoint, num=num_segments)[1:]))
                 index_out = np.append( index_out ,np.full(num_segments -1,index))
                 currentXYZE = endPoint
-        print(points_out)
+      
         print("end - segmentizeLines")
         return index_out, points_out
 
