@@ -1,10 +1,10 @@
 
 
 import numpy as np
-import globals
-def readGcodeFileToDicList( file_path) -> list:
+from NonPlainarSlicing.globals  import Glob
+def readGcodeFileToDicList( file_path) -> list[None] | None:
     print("start - read_gcode")
-    
+
     try:
         instructions = []
         i = 0
@@ -13,13 +13,12 @@ def readGcodeFileToDicList( file_path) -> list:
             lines = file.readlines()  # Read all lines into a list
             instructions = [None] * len(lines)  # Create a list of None with the same length
 
-            totall_steps = len(lines)
-            steps = 0
+            Glob.initialize_progress(len(lines))
             
             for line in lines:
-                #line = line.split(';')[0].strip()
-                globals.progress = steps / float(totall_steps)
-                steps += 1
+
+                Glob.progressed()
+
 
                 if not line:
                     continue

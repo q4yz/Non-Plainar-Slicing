@@ -1,6 +1,6 @@
 
 
-from .splite import multisplit
-from .smoothMesh import smoothMesh
+from .splite import multi_split
+from .smoothMesh import smooth_mesh
 
 

@@ -7,7 +7,7 @@ import numpy as np
 import logging
 
 
-class TransformerPlain():
+class TransformerPlain:
 
     mesh = None
     boundingbox = None
