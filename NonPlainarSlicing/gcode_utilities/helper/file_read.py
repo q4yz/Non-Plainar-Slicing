@@ -2,7 +2,8 @@
 
 import numpy as np
 from NonPlainarSlicing.globals  import Glob
-def readGcodeFileToDicList( file_path) -> list[None] | None:
+
+def helper_read_gcode_file_to_dic_list(file_path) -> list[None] :
     print("start - read_gcode")
 
     try:
@@ -13,11 +14,11 @@ def readGcodeFileToDicList( file_path) -> list[None] | None:
             lines = file.readlines()  # Read all lines into a list
             instructions = [None] * len(lines)  # Create a list of None with the same length
 
-            Glob.initialize_progress(len(lines))
+            #Glob.initialize_progress(len(lines))
             
             for line in lines:
 
-                Glob.progressed()
+                #Glob.progressed()
 
 
                 if not line:
@@ -53,6 +54,6 @@ def readGcodeFileToDicList( file_path) -> list[None] | None:
         print(f"Error: File not found at {file_path}")
     except Exception as e:
         print(f"Error reading file: {e}")
-    return None
+
 
 

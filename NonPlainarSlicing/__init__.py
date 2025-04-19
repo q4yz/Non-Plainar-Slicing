@@ -3,8 +3,7 @@ from .Pytq5_UI import MainWindow
 from .viewer_methods_module import  ViewerMethoden
 from .globals import Glob
 
-#from .mesh_utils import *
-#from .mesh_object import *
+
 #
 
 #from .settings import *

@@ -1,9 +1,16 @@
 import trimesh
 import numpy as np
-from ..globals import Glob
+from ...globals import ProgressTracker
 
 
-def smooth_mesh(mesh: trimesh.Trimesh, angle: float, tol=1e-6) -> trimesh.Trimesh:
+def calc_max_allowed_z_raise(point, neighbors, angle):
+    return point[2] + np.arctan(np.radians(angle)) * calc_xy_distance(point, neighbors)
+
+
+def calc_xy_distance(point, neighbors):
+    return np.sqrt(np.square(neighbors[:, 0] - point[0]) + np.square(neighbors[:, 1] - point[1]))
+
+def helper_smooth_plain_mesh(mesh: trimesh.Trimesh, angle: float, progress_callback: ProgressTracker) -> trimesh.Trimesh:
     """
         Smooths the Z-coordinates of a mesh's vertices by enforcing a maximum slope angle.
 
@@ -35,37 +42,34 @@ def smooth_mesh(mesh: trimesh.Trimesh, angle: float, tol=1e-6) -> trimesh.Trimes
     vertices = mesh.vertices.copy()
     faces = mesh.faces.copy()
 
-    
-    Glob.progress2 = 0
+    progress_callback.initialize(1)
     change = np.inf
     count = 0
-
+    tol= 1e-6
     while change > tol:
         prev_vertices = vertices.copy()
         # Process all vertices (possibly in a fixed order or via BFS)
 
-        Glob.set_progress2(count / float(len(vertices)))
+        progress_callback.set_progress(count / float(len(vertices)))
 
         for i in range(len(vertices)):
-
-            
             # Here, you might use a fixed order rather than re-sorting every time.
             # Alternatively, you can structure your propagation differently.
             neighbors_faces = faces[np.any(faces == i, axis=1)]
             neighbors = np.unique(neighbors_faces.ravel())
             z_min_v = vertices[i]
             # Clamp neighbors above z_min + max_z_diff.
-            vertices[neighbors, 2] = np.where(vertices[neighbors, 2] > z_min_v[2] + np.arctan(np.radians(angle)) * np.sqrt( np.square(vertices[neighbors, 0] - z_min_v[0]) + np.square(vertices[neighbors, 1] - z_min_v[1]) ), 
-                                              z_min_v[2] + np.arctan(np.radians(angle)) * np.sqrt( np.square(vertices[neighbors, 0] - z_min_v[0]) + np.square(vertices[neighbors, 1] - z_min_v[1]) ),
-                                              vertices[neighbors, 2])
+
+            allowed_max = calc_max_allowed_z_raise(z_min_v, vertices[neighbors], angle)
+            vertices[neighbors, 2] = np.minimum(vertices[neighbors, 2], allowed_max)
+
+
         change = np.abs(vertices - prev_vertices).max()
 
-        count_changed = np.sum(vertices[:,2] == prev_vertices[:,2])
+        count_changed = np.sum(vertices[:, 2] == prev_vertices[:, 2])
         count = count_changed
-        
 
-        Glob.set_progress2(0)
+    progress_callback.initialize(1)
 
-    return trimesh.Trimesh(vertices=vertices, faces=faces)
-
-
+    mesh.vertices = vertices
+    mesh.faces = faces

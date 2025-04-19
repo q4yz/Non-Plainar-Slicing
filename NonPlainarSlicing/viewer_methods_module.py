@@ -3,11 +3,11 @@
 import tkinter
 from tkinter import filedialog
 
+import trimesh
 from PyQt5 import QtWidgets, QtCore
 
 
-import mesh_object
-import gcode_object
+
 
 import logging
 from threading import Thread
@@ -19,8 +19,9 @@ from settings import *
 import subprocess
 import tempfile
 
-
+from .gcode_utilities.gcode_object import GcodeObject
 from .globals import Glob
+from .mesh_utilities.mesh_tools import MeshTools
 
 
 class ViewerMethoden(QtWidgets.QMainWindow):
@@ -50,7 +51,7 @@ class ViewerMethoden(QtWidgets.QMainWindow):
         self.busy = True
 
         
-        Glob.set_progress(0)
+        Glob.get_main_tracker().set_progress(0)
 
         t = Thread(target=self._run_and_complete, args=(target_method, *args))
         t.start()
@@ -62,7 +63,7 @@ class ViewerMethoden(QtWidgets.QMainWindow):
         finally:
             self.busy = False  
             
-            Glob.set_progress(1)
+            Glob.get_main_tracker().set_progress(1)
             if hasattr(self, 'meshObject'):          
                 self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
 
@@ -103,7 +104,7 @@ class ViewerMethoden(QtWidgets.QMainWindow):
         root.withdraw()
 
 
-        Glob.initialize_progress_2(2)
+        Glob.get_sub_tracker().initialize(2)
 
         file_path = tkinter.filedialog.askopenfile(mode='r',
         initialdir=r'C:\Daten\Test-Slicer\OBJ_IN', 
@@ -113,69 +114,81 @@ class ViewerMethoden(QtWidgets.QMainWindow):
 
         if file_path:
 
-            
-
-            Glob.progressed_2()
+            Glob.get_sub_tracker().step()
 
             print("Selected file:", file_path.name)
             file_path.close()  
-            self.meshObject = mesh_object.MeshObject(path = file_path.name )
+            #self.meshObject = mesh_object.MeshObject(path = file_path.name )
+            # max_p = settings['max_p']
+            # distortion_resolution = settings['distortionresolution']
+            # self.create_transformer_plain(distortion_resolution, max_p)
 
-            max_p = settings['max_p']
-            distortion_resolution = settings['distortionresolution']
-            self.meshObject.create_transformer_plain(distortion_resolution, max_p)
+            self.mesh = trimesh.load_mesh( file_path.name )
+            MeshTools.shift_to_center(self.mesh)
+            self.plain = MeshTools.create_plane(self.mesh.bounds, Glob.get_settings(),1.13423231,Glob.get_sub_tracker())
+
+
 
             
             
             self.state = 1
-        Glob.progressed_2()
+        Glob.get_sub_tracker().step()
         
 
     def _run(self):
 
 
-        Glob.initialize_progress(6)
-        Glob.progressed()
+        Glob.get_main_tracker().initialize(6)
+        Glob.get_main_tracker().step()
 
         self._load_obj()
-
-        Glob.progressed()
-        if not hasattr(self, 'meshObject'):  
+        Glob.get_main_tracker().step()
+        if not hasattr(self, 'mesh'):
             return
 
         
-        self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
-        self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
+        self.display_mesh(self.mesh, color="blue", name="mesh")
+        self.display_mesh( self.plain, color="red", name="plain")
 
         self._trans_transformer_plain()
-        Glob.progressed()
-        self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
-        self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
-                
-                    
-        self._split()
-        Glob.progressed()
-        self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
-        self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
 
+        Glob.get_main_tracker().step()
+        self.display_mesh(self.mesh, color="blue", name="mesh")
+        self.display_mesh(self.plain, color="red", name="plain")
+
+        self._split()
+
+        Glob.get_main_tracker().step()
+
+        self.display_mesh(self.mesh, color="blue", name="mesh")
+
+        self.display_mesh(self.plain, color="red", name="plain")
 
         self._distort()
-        Glob.progressed()
-        self.display_mesh(self.meshObject.mesh, color="blue", name="mesh")
-        self.display_mesh( self.meshObject.transformerPlain.mesh, color="red", name="plain")
+
+        Glob.get_main_tracker().step()
+        self.display_mesh(self.mesh, color="blue", name="mesh")
+        self.display_mesh(self.plain, color="red", name="plain")
        
         path_gcode1 = self.slice()
-     
 
-        self.meshObject.gcode = gcode_object.Gcode(path_gcode1,self.meshObject, 0.5)
-        Glob.progressed()
+        self.g = GcodeObject(path_gcode1)
+        self.g.move_to_center()
+        self.g.segment_lines(0.5)
+        self.g.transform_back_gcode_on_plain(self.plain)
+        self.g.move_to_original_position()
+
+
+
+        #self.meshObject.gcode = gcode_object.Gcode(path_gcode1,self.meshObject, 0.5)
+        Glob.get_main_tracker().step()
 
         self.state = 6
 
     def slice (self):
         with tempfile.NamedTemporaryFile(suffix=".stl", delete=False) as temp_stl:
 
-                self.meshObject.mesh.export(temp_stl.name)  # Save mesh as STL
+                self.mesh.export(temp_stl.name)  # Save mesh as STL
 
                 slic3r_path = os.path.abspath(os.path.join("..","external_tools", "Slic3r-1.3.0.64bit", "Slic3r-console.exe"))
 
@@ -216,7 +229,9 @@ class ViewerMethoden(QtWidgets.QMainWindow):
 
    
     def _import_gcode(self):
-        pass
+
+        raise "nicht mehr aktuell"
+
         file_path = tkinter.filedialog.askopenfile(mode='r',
         initialdir=r'C:\Daten\Test-Slicer\Gcode_IN',  # Set your default directory path here
         filetypes=[('gcode files', '*.gcode'), ('All files', '*.*')]  # Set .obj as default
@@ -227,7 +242,8 @@ class ViewerMethoden(QtWidgets.QMainWindow):
             selectedPath:str = file_path.name
             file_path.close()  
 
-            self.meshObject.gcode = gcode_object.Gcode(selectedPath,self.meshObject, 0.5)
+
+            #self.meshObject.gcode = gcode_object.Gcode(selectedPath,self.meshObject, 0.5)
 
         self.state = 6
  
@@ -242,9 +258,10 @@ class ViewerMethoden(QtWidgets.QMainWindow):
             )
 
         if save_file_path: 
-            path = save_file_path
+            path = save_file_path.name
             save_file_path.close()
-            gcode_object.export(path.name,self.meshObject.gcode.gcode_out )
+            self.g.export(path)
+
             
 
         self.state = 8
@@ -253,8 +270,8 @@ class ViewerMethoden(QtWidgets.QMainWindow):
     def _split(self):
         logging.info("----Button Split Pressed----") 
 
-        
-        self.meshObject.split_mesh_edge_on_trans()
+        MeshTools.split_mesh_on_edges_from_plain(self.plain, self.mesh, Glob.get_main_tracker())
+        #self.meshObject.split_mesh_edge_on_trans()
         self.state = 2
       
 
@@ -264,11 +281,14 @@ class ViewerMethoden(QtWidgets.QMainWindow):
         def option_selected(option):
             root.destroy()  
             if option == 1:
-                self.meshObject.xSlop()
+                MeshTools.transform_plain_slop(self.plain, self.mesh, Glob.get_settings(),Glob.get_sub_tracker())
+                #self.meshObject.xSlop()
             elif option == 2:
-                self.meshObject.flattop()
+                MeshTools.transform_smooth_surface(self.plain, self.mesh, Glob.get_settings(),Glob.get_sub_tracker())
+                #self.meshObject.flattop()
             elif option == 3:
-                self.meshObject.noSupport()
+                MeshTools.transform_avoid_overhangs(self.plain, self.mesh, Glob.get_settings(), Glob.get_sub_tracker())
+                #self.meshObject.noSupport()
             
 
         root = tk.Tk()
@@ -297,8 +317,8 @@ class ViewerMethoden(QtWidgets.QMainWindow):
     def _distort(self):
 
         logging.info("----Button Distort Pressed----") 
-      
-        self.meshObject.distort()
+        MeshTools.distort_mesh_on_plain(self.plain, self.mesh, Glob.get_sub_tracker())
+        #self.meshObject.distort()
         self.state = 4
 
 
